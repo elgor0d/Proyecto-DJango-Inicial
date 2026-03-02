@@ -44,9 +44,9 @@ def admin_panel(request):
     if not request.user.is_superuser:
         return redirect("user_panel")
 
-    return render(request, "accounts/admin_panel.html")
+    return render(request, "dashboard/admin_panel.html")
 
 
 @login_required
 def user_panel(request):
-    return render(request, "accounts/user_panel.html")
+    return render(request, "dashboard/alumno.html")
