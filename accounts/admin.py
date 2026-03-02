@@ -1,3 +1,5 @@
 from django.contrib import admin
 
-# Register your models here.
+admin.site.site_header = "Sistema Académico UTSOE"
+admin.site.site_title = "UTSOE Admin"
+admin.site.index_title = "Panel de Administración"

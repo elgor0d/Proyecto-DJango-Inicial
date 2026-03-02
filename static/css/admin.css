@@ -1,0 +1,16 @@
+body.login {
+    background: #0c2d57;
+}
+
+.login-container h1 {
+    color: white;
+    text-align: center;
+}
+
+#header {
+    background: #0c2d57;
+}
+
+.module h2, .module caption {
+    background: #145da0;
+}
