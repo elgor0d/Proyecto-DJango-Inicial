@@ -1,9 +1,14 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.urls import reverse
+from django.contrib import messages
 
 
 def login_view(request):
+
+    next_url = request.GET.get('next')
+
     if request.method == "POST":
         username = request.POST["username"]
         password = request.POST["password"]
@@ -12,13 +17,19 @@ def login_view(request):
                             username=username,
                             password=password)
 
-        if user is not None:
+        if user:
             login(request, user)
 
+
+            if next_url:
+                return redirect(next_url)
+
             if user.is_superuser:
-                return redirect("admin_panel")
-            else:
-                return redirect("user_panel")
+                return redirect("admin:index")
+
+            return redirect("user_panel")
+
+        messages.error(request, "Credenciales incorrectas")
 
     return render(request, "accounts/login.html")
 

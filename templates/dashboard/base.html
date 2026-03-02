@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sistema UTSOE</title>
+
+<style>
+body{
+    margin:0;
+    font-family:Arial;
+    display:flex;
+}
+
+/* SIDEBAR */
+.sidebar{
+    width:250px;
+    height:100vh;
+    background:#0b2c4d;
+    color:white;
+    padding:20px;
+}
+
+.sidebar h2{
+    text-align:center;
+}
+
+.sidebar a{
+    display:block;
+    color:white;
+    text-decoration:none;
+    padding:10px;
+    margin:8px 0;
+}
+
+.sidebar a:hover{
+    background:#124b80;
+}
+
+/* CONTENIDO */
+.content{
+    flex:1;
+    padding:30px;
+    background:#f4f6f9;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="sidebar">
+
+    <h2>UTSOE</h2>
+
+    <a href="#">Dashboard</a>
+    <a href="#">Usuarios</a>
+    <a href="#">Materias</a>
+    <a href="#">Calificaciones</a>
+    <a href="{% url 'logout' %}">Cerrar sesión</a>
+
+</div>
+
+<div class="content">
+    {% block content %}
+    {% endblock %}
+</div>
+
+</body>
+</html>
