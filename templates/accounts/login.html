@@ -1,0 +1,119 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Login Sistema UTSOE</title>
+
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+
+            background: linear-gradient(
+                135deg,
+                #2c0b3f,
+                #7b1fa2,
+                #1a237e
+            );
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login-box {
+            width: 350px;
+            padding: 40px;
+            border-radius: 20px;
+
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(15px);
+
+            text-align: center;
+            color: white;
+        }
+
+        .logo {
+            width: 100px;
+            margin-bottom: 15px;
+        }
+
+        h2 {
+            margin-bottom: 25px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 15px 0;
+
+            border: none;
+            border-bottom: 2px solid white;
+            background: transparent;
+
+            color: white;
+            outline: none;
+        }
+
+        input::placeholder {
+            color: #ddd;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 20px;
+
+            border: none;
+            border-radius: 10px;
+
+            background: linear-gradient(
+                90deg,
+                #ff004c,
+                #3f51b5
+            );
+
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="login-box">
+
+    <!-- LOGO -->
+    <img src="{% static 'img/logo.png' %}" class="logo">
+
+    <h2>Login Sistema UTSOE</h2>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <input type="text"
+               name="username"
+               placeholder="Usuario"
+               required>
+
+        <input type="password"
+               name="password"
+               placeholder="Contraseña"
+               required>
+
+        <button type="submit">
+            INGRESAR
+        </button>
+    </form>
+
+</div>
+
+</body>
+</html>
