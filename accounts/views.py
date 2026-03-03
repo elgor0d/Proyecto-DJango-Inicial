@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import HttpResponseForbidden
 from urllib.parse import urlparse
+from datetime import datetime
 
 
 def login_view(request):
@@ -17,23 +18,31 @@ def login_view(request):
     next_url = request.GET.get('next')
 
     if request.method == "POST":
+
+        # ✅ Se pasa directo sin guardar la contraseña en variables extra
         username = request.POST.get("username", "").strip()
-        password = request.POST.get("password", "")
 
         # Evita procesar si los campos están vacíos
-        if not username or not password:
+        if not username or not request.POST.get("password", ""):
             messages.error(request, "Por favor completa todos los campos.")
             return render(request, "accounts/login.html")
 
-        user = authenticate(request, username=username, password=password)
+        user = authenticate(
+            request,
+            username=username,
+            password=request.POST.get("password", "")  # ✅ Sin variable extra
+        )
 
         if user:
             login(request, user)
 
+            # ✅ Solo guarda datos no sensibles en la sesión
+            request.session['ultimo_acceso'] = str(datetime.now())
+
             # Validar que next_url sea una ruta interna (evita Open Redirect)
             if next_url:
                 parsed = urlparse(next_url)
-                if not parsed.netloc and not parsed.scheme:  # Es ruta relativa
+                if not parsed.netloc and not parsed.scheme:
                     return redirect(next_url)
 
             if user.is_superuser:
@@ -47,25 +56,26 @@ def login_view(request):
 
 
 def logout_view(request):
-    # Solo permitir logout por POST evita cerrar sesión con un simple enlace
     if request.method == "POST":
+
+        # ✅ Limpia datos sensibles de la sesión antes de cerrar
+        request.session.pop('ultimo_acceso', None)
+        request.session.flush()  # ✅ Elimina toda la sesión de la memoria
+
         logout(request)
         return redirect("login")
-    return redirect("user_panel")  # GET al logout no hace nada
+    return redirect("user_panel")
 
 
 @login_required(login_url="/")
 def admin_panel(request):
     if not request.user.is_superuser:
-        # 403 en lugar de redirigir, evita que usuarios prueben rutas de admin
         return HttpResponseForbidden("No tienes permiso para acceder aquí.")
-
     return render(request, "dashboard/admin_panel.html")
 
 
 @login_required(login_url="/")
 def user_panel(request):
-    # Pasar el usuario al template para mostrar sus datos de forma segura
     return render(request, "dashboard/alumno.html", {
         "user": request.user
     })

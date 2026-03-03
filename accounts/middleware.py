@@ -29,3 +29,12 @@ class AdminAccessMiddleware:
 
         response = self.get_response(request)
         return response
+    
+    def __call__(self, request):
+        response = self.get_response(request)
+    
+        # ✅ Elimina el header que expone la versión del servidor
+        response.headers.pop('Server', None)
+        response.headers.pop('X-Powered-By', None)
+    
+        return response

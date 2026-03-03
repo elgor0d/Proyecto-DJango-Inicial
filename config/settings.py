@@ -7,8 +7,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # ─────────────────────────────────────────────
 # SEGURIDAD — mover a .env en producción
 # ─────────────────────────────────────────────
-SECRET_KEY = 'django-insecure-mg3(a=wpd3e#_y&6t3fw=3yndd(5(y8r(fl1b)mds6^$e#w%3#'
-DEBUG = True
+SECRET_KEY = config('SECRET_KEY')
+DEBUG = False
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
 # ─────────────────────────────────────────────
@@ -23,6 +23,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'accounts',
     'axes',
+    'sslserver',
+    'security',
+    'csp',
 ]
 
 # ─────────────────────────────────────────────
@@ -37,6 +40,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'csp.middleware.CSPMiddleware',
     'accounts.middleware.AdminAccessMiddleware',
     'axes.middleware.AxesMiddleware',                      # Axes siempre al final
 ]
@@ -85,8 +89,8 @@ DATABASES = {
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-        'OPTIONS': {'min_length': 8},   # ✅ Mínimo 8 caracteres explícito
+    'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+    'OPTIONS': {'min_length': 10},   # ✅ Mínimo 8 caracteres explícito
     },
     {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
@@ -111,8 +115,8 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 # ─────────────────────────────────────────────
 # SESIONES Y COOKIES
 # ─────────────────────────────────────────────
-SESSION_COOKIE_SECURE = True       # → True en producción (HTTPS)
-CSRF_COOKIE_SECURE = True         # → True en producción (HTTPS)
+SESSION_COOKIE_SECURE = False       # → True en producción (HTTPS)
+CSRF_COOKIE_SECURE = False         # → True en producción (HTTPS)
 SESSION_COOKIE_HTTPONLY = True      # ✅ JS no puede leer la cookie de sesión
 CSRF_COOKIE_HTTPONLY = True         # ✅ JS no puede leer el token CSRF
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # ✅ Sesión termina al cerrar navegador
@@ -124,6 +128,10 @@ SESSION_COOKIE_AGE = 3600           # ✅ Sesión expira en 1 hora
 SECURE_BROWSER_XSS_FILTER = True    # ✅ Corrección del nombre (tenías SESSION_BROWSER...)
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = 'DENY'            # ✅ Evita clickjacking
+SECURE_HSTS_SECONDS = 0       # → activar en producción
+SECURE_HSTS_INCLUDE_SUBDOMAINS = False
+SECURE_SSL_REDIRECT = False
+SECURE_HSTS_PRELOAD = False
 
 # ─────────────────────────────────────────────
 # LOGIN / LOGOUT
@@ -148,5 +156,34 @@ AXES_USERNAME_FORM_FIELD = 'username'
 AXES_LOCKOUT_PARAMETERS = ['ip_address', 'username']
 AXES_LOCKOUT_URL = '/'              # ✅ Redirige al login al quedar bloqueado
 AXES_VERBOSE = False                # ✅ Limpia logs en producción
+AXES_NEVER_LOCKOUT_WHITELIST = True
+AXES_IP_WHITELIST = ['127.0.0.1']  # Solo tu IP puede acceder al admin
+
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Django usa PBKDF2 por defecto, pero puedes forzarlo
+PASSWORD_HASHERS = [
+    'django.contrib.auth.hashers.PBKDF2PasswordHasher',  # ✅ Por defecto
+    'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',  # Alternativa más fuerte
+]
+
+CONTENT_SECURITY_POLICY = {
+    "DIRECTIVES": {
+        "default-src": ("'self'",),
+        "style-src": ("'self'", "'unsafe-inline'"),  # ✅ Permite estilos inline
+        "script-src": ("'self'",),
+        "img-src": ("'self'", "data:"),
+        "font-src": ("'self'", "https://cdn.jsdelivr.net"),
+        "connect-src": ("'self'",),
+        "media-src": ("'self'",),
+        "object-src": ("'none'",),
+        "frame-src": ("'none'",),
+        "base-uri": ("'self'",),
+        "form-action": ("'self'",),
+        "frame-ancestors": ("'none'",),
+    }
+}
+
+# Evita que otros dominios embeba tu sitio
+SECURE_CROSS_ORIGIN_OPENER_POLICY = "same-origin"
