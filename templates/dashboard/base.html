@@ -67,7 +67,12 @@
 
     <a href="#"><i class="bi bi-journal-bookmark"></i> Materias</a>
     <a href="#"><i class="bi bi-bar-chart"></i> Reportes</a>
-    <a href="{% url 'logout' %}"><i class="bi bi-box-arrow-right"></i> Cerrar sesión</a>
+    <form method="POST" action="{% url 'logout' %}">
+    {% csrf_token %}
+    <button type="submit">
+        <i class="bi bi-box-arrow-right"></i> Cerrar sesión
+    </button>
+</form>
 </div>
 
 <div class="content">

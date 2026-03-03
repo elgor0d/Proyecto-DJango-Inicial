@@ -1,5 +1,6 @@
-<h1>Panel Usuario</h1>
-
-<p>Bienvenido {{ user.username }}</p>
-
-<a href="/logout/">Cerrar sesión</a>
+<form method="POST" action="{% url 'logout' %}">
+    {% csrf_token %}
+    <button type="submit">
+        <i class="bi bi-box-arrow-right"></i> Cerrar sesión
+    </button>
+</form>
